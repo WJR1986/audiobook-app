@@ -1,6 +1,6 @@
 // 1. SUPABASE SETUP
-const SUPABASE_URL = 'YOUR_SUPABASE_URL'; // Replace with your URL
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; // Replace with your Anon Key
+const SUPABASE_URL = 'https://emuydrvfmzkblwifyisv.supabase.co'; // Replace with your URL
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtdXlkcnZmbXprYmx3aWZ5aXN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU4MDA1NDgsImV4cCI6MjA3MTM3NjU0OH0.SzPdRdjJCNrXEg0rm-waP6puAOv8I45OR6DBOdSxGKs'; // Replace with your Anon Key
 
 const supabase = self.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -10,13 +10,10 @@ const mainContent = document.querySelector('#main-content');
 const logoutButton = document.querySelector('#logout-button');
 const authForm = document.querySelector('#auth-form');
 const authError = document.querySelector('#auth-error');
-// New elements for book importing
 const addBookButton = document.querySelector('#add-book-button');
 const bookInput = document.querySelector('#book-input');
 
-
 // 3. AUTHENTICATION LOGIC
-// ... (Your existing authentication code is unchanged)
 authForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   authError.classList.add('d-none');
@@ -32,14 +29,12 @@ authForm.addEventListener('submit', async (event) => {
     return;
   }
   
-  console.log('User signed in:', data);
   authForm.reset();
 });
 
 logoutButton.addEventListener('click', async () => {
   await supabase.auth.signOut();
 });
-
 
 // 4. UI STATE MANAGEMENT
 function updateUI(user) {
@@ -54,27 +49,32 @@ function updateUI(user) {
   }
 }
 
-
 // 5. BOOK IMPORTING
 addBookButton.addEventListener('click', () => {
-  // When the "Add Book" button is clicked, trigger the hidden file input
   bookInput.click();
 });
 
 bookInput.addEventListener('change', (event) => {
   const file = event.target.files[0];
   if (!file) {
-    return; // User cancelled the file selection
+    return;
   }
-
   console.log('Selected file:', file.name);
-  alert(`You selected the file: ${file.name}`); // A simple confirmation for now
-
-  // We will add the unzipping logic here in the next step
+  alert(`You selected the file: ${file.name}`);
 });
 
+// 6. PAGE LOAD AND AUTH LISTENER
+// This new function checks for an existing session when the page loads
+async function checkSession() {
+    const { data, error } = await supabase.auth.getSession();
+    const user = data.session?.user;
+    updateUI(user);
+}
 
-// 6. LISTEN FOR AUTH CHANGES
+// Run the check when the script loads
+checkSession();
+
+// Listen for future auth changes
 supabase.auth.onAuthStateChange((event, session) => {
   const user = session?.user;
   updateUI(user);
