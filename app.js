@@ -54,27 +54,45 @@ addBookButton.addEventListener('click', () => {
   bookInput.click();
 });
 
-bookInput.addEventListener('change', (event) => {
+bookInput.addEventListener('change', async (event) => {
   const file = event.target.files[0];
   if (!file) {
     return;
   }
-  console.log('Selected file:', file.name);
-  alert(`You selected the file: ${file.name}`);
+
+  // New unzipping logic starts here
+  console.log(`Starting to process ${file.name}...`);
+  
+  try {
+    const zip = await JSZip.loadAsync(file); // Load the ZIP file
+    
+    console.log("Files found inside the zip:");
+    // Loop through each file in the zip and log its name
+    zip.forEach((relativePath, zipEntry) => {
+      console.log("- ", zipEntry.name);
+    });
+
+    alert("Successfully read the zip file! Check the console to see the file list.");
+
+  } catch (error) {
+    console.error("Error reading the zip file:", error);
+    alert("Sorry, there was an error reading that zip file.");
+  }
+  
+  // Reset the input so the user can select the same file again
+  bookInput.value = '';
 });
 
+
 // 6. PAGE LOAD AND AUTH LISTENER
-// This new function checks for an existing session when the page loads
 async function checkSession() {
     const { data, error } = await supabase.auth.getSession();
     const user = data.session?.user;
     updateUI(user);
 }
 
-// Run the check when the script loads
 checkSession();
 
-// Listen for future auth changes
 supabase.auth.onAuthStateChange((event, session) => {
   const user = session?.user;
   updateUI(user);
