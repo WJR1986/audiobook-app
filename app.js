@@ -102,7 +102,7 @@ bookInput.addEventListener('change', async (e) => {
 
     // Save book metadata to Supabase
     const newBook = {
-      id: bookId,
+      // id: bookId, <-- THIS LINE IS REMOVED
       user_id: user.id,
       title: file.name.replace('.zip', ''),
       author: 'Unknown Author',
